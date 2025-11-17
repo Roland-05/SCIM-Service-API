@@ -17,11 +17,13 @@ class EmailScim(BaseModel):
     type: Optional[str] = None
     primary: Optional[bool] = None
 
-class MetaScim(BaseModel):
     #Output/ GET
+class MetaScim(BaseModel):
+    
     resourceType: str
     created: datetime
     lastModified: datetime 
+    version: Optional[str] = None
     location: Optional[str] = None
 
 class AddressScim(BaseModel):

@@ -30,6 +30,7 @@ class Meta(SQLModel, table = True):
     resourceType: str = "User"
     created: datetime = SQLField(default_factory=datetime.utcnow, nullable = False)
     lastModified: datetime = SQLField(default_factory=datetime.utcnow, nullable=False)
+    version: Optional[str] = None
     location: Optional[str] # URL of resource
 
     # Foreign key with unique=True constraint (one Meta object per User)
@@ -85,12 +86,13 @@ class User(SQLModel, table = True):
     active: Optional[bool] = True
 
     # Optional fields
-    locale: Optional[str] | None = None
-    timezone: Optional[str] | None = None
-    nickName: Optional[str] | None = None
-    profileUrl: Optional[str] | None = None
-    title: Optional[str] | None = None
-    userType: Optional[str] | None = None
+    locale: Optional[str] = None
+    timezone: Optional[str] = None
+    nickName: Optional[str] = None
+    profileUrl: Optional[str] = None
+    title: Optional[str] = None
+    userType: Optional[str] = None
+    preferredLanguage: Optional[str] = None
 
    # required: Defines the schema URIs this resource uses
     schemas: list[str] = SQLField(default_factory=lambda: ["urn:ietf:params:scim:schemas:core:2.0:User"])
