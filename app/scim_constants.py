@@ -6,5 +6,5 @@ SCHEMA_ENTERPRISE_USER = (
     "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
 )
 
-# Core SCIM Group Schema 
+# Core SCIM Group Schema (Future)
 SCHEMA_CORE_GROUP = "urn:ietf:params:scim:schemas:core:2.0:Group"

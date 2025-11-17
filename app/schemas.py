@@ -47,8 +47,29 @@ class phoneNumberScim(BaseModel):
     display: Optional[str] = None
     type: Optional[str] = None
 
+class PhotoScim(BaseModel):
+    value: str
+    type: Optional[str] = None
 
+class ImScim(BaseModel):
+    value: str
+    type: Optional[str] = None
 
+class RoleScim(BaseModel):
+    value: str
+
+class EntitlementScim(BaseModel):
+    value: str
+
+class EntitlementScim(BaseModel):
+    value: str
+
+class GroupRefScim(BaseModel):
+    value: str
+    ref: Optional[str] = Field(default=None, alias="$ref")
+    display: Optional[str] = None
+
+    model_config = {"populate_by_name": True}
 
 # Main API Schemas
 
@@ -75,7 +96,7 @@ class UserCreate(BaseModel):
     organization: Optional[str] = None
     division: Optional[str] = None
     department: Optional[str] = None
-    manager: Optional[ManagerScim] 
+    manager: Optional[ManagerScim] = None
 
 
 # GET response schema
@@ -106,6 +127,13 @@ class UserPublic(BaseModel):
     division: Optional[str] = None
     department: Optional[str] = None
     manager: Optional[ManagerScim] 
+
+    photos: list[PhotoScim] = APIField(default_factory=list)
+    ims: list[ImScim] = APIField(default_factory = list)
+    roles: list[RoleScim] = APIField(default_factory=list)
+    entitlements: list[EntitlementScim] = APIField(default_factory=list)
+    groups: list[GroupRefScim] = APIField(default_factory=list)
+
 
 
     # map data from SQLModel to ORM object
