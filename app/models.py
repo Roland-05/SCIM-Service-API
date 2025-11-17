@@ -55,12 +55,12 @@ class Address(SQLModel, table=True):
     user: "User" = Relationship(back_populates="addresses")
 
 class phoneNumber(SQLModel, table=True):
-    id: Optional[str] = SQLField(default=None, primary_key=True)
+    id: Optional[int] = SQLField(default=None, primary_key=True)
     value: str = None
     display: Optional[str] = None
     type: Optional[str] = None
 
-    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique=True)
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
     user: "User" = Relationship(back_populates="phoneNumbers")
 
 # Enterprise User Schema Extension
@@ -70,11 +70,11 @@ class Manager(SQLModel, table=True):
 
     # id of the user id , how
     value: Optional[str] = None
-    ref: Optional[str] = None # URI of the manager resource
+    ref: Optional[str] = SQLField(default=None, alias="$ref") # URI of the manager resource
     displayName: Optional[str] = None 
 
     user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
-    user: "User" = Relationship(back_populates="manager_data")
+    user: "User" = Relationship(back_populates="manager")
     
 
 
@@ -101,7 +101,7 @@ class User(SQLModel, table = True):
     emails: list[Email] = Relationship(back_populates="user")
     addresses: list[Address] = Relationship(back_populates="user")
     meta: Optional[Meta] = Relationship(back_populates="user")
-    phoneNumbers: Optional[phoneNumber] = Relationship(back_populates="user")
+    phoneNumbers: list[phoneNumber] = Relationship(back_populates="user")
 
     # enterprise
     employeeNumber: Optional[str] = None
@@ -109,7 +109,7 @@ class User(SQLModel, table = True):
     organization: Optional[str] = None
     division: Optional[str] = None
     department: Optional[str] = None
-    manager_data: Optional[Manager] = Relationship(back_populates="user")
+    manager: Optional[Manager] = Relationship(back_populates="user")
 
 
 #API Sub-Schema
@@ -148,7 +148,7 @@ class AddressScim(BaseModel):
 
 class ManagerScim(BaseModel):
     value: Optional[str] = None
-    ref: Optional[str] = None
+    ref: Optional[str] = APIField(default=None, alias="$ref")
     displayName: Optional[str] = None
 
 class phoneNumberScim(BaseModel):
@@ -184,7 +184,7 @@ class UserCreate(BaseModel):
     organization: Optional[str] = None
     division: Optional[str] = None
     department: Optional[str] = None
-    manager_data: Optional[ManagerScim] 
+    manager: Optional[ManagerScim] 
 
 
 # GET response schema
@@ -205,8 +205,8 @@ class UserPublic(BaseModel):
     name: Optional[NameScim] = None
     emails: list[EmailScim] 
     meta: MetaScim
-    addresses: list[AddressScim] 
-    phoneNumbers: list[phoneNumberScim] = None
+    addresses: list[AddressScim] = APIField(default_factory=list)
+    phoneNumbers: list[phoneNumberScim] = APIField(default_factory=list)
 
     # enterprise
     employeeNumber: Optional[str] = None
@@ -214,7 +214,7 @@ class UserPublic(BaseModel):
     organization: Optional[str] = None
     division: Optional[str] = None
     department: Optional[str] = None
-    manager_data: Optional[ManagerScim] 
+    manager: Optional[ManagerScim] 
 
 
     # map data from SQLModel to ORM object
