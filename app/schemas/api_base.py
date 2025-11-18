@@ -1,16 +1,10 @@
 from pydantic import BaseModel
-
-def to_snake(string: str) -> str:
-    out = []
-
-    for char in string:
-        if char.isupper():
-            out.append('_')
-            out.append(char.lower())
-
-        else:
-            out.append(char)
-
-    return ''.join(out)
+from pydantic.alias_generators import to_snake
 
 # Define a base Schema class using alias_generator
+
+class APIBase(BaseModel):
+    model_config = {
+        "alias_generator": to_snake, # applied during serialisation
+        "populate_by_name": True, # Assign values using snake_case attribute names.
+    }

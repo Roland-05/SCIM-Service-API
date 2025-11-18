@@ -45,7 +45,6 @@ class ManagerScim(APIBase):
     ref: Optional[str] = Field(default=None, alias="$ref")
     display_name: Optional[str] = None
 
-    model_config = {"populate_by_name": True} # populate manager.ref
 
 class PhoneNumberScim(APIBase):
     value: str 
@@ -71,4 +70,3 @@ class GroupRefScim(APIBase):
     value: str
     ref: Optional[str] = Field(default=None, alias="$ref")
     display: Optional[str] = None
-    model_config = {"populate_by_name": True}

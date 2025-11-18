@@ -50,6 +50,3 @@ class UserPublic(APIResponse):
     groups: list[GroupRefScim] = Field(default_factory=list)
 
 
-
-    # map data from SQLModel to ORM object
-    model_config = {"from_attributes": True}

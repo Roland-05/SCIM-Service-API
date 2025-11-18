@@ -6,7 +6,7 @@ def to_camel(string: str) -> str:
 
 class APIResponse(BaseModel):
     model_config = {
-        "alias_generator": to_camel,
+        "alias_generator": to_camel, # during serialisation
         "populate_by_name": True, 
-        "from_attributes": True
+        "from_attributes": True # read data from SQLModel instances
     }
