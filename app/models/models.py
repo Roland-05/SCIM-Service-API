@@ -17,12 +17,12 @@ class Name(SQLModel, table = True):
 
 class Email(SQLModel, table=True):
     id: Optional[int] = SQLField(default=None, primary_key = True)
-    value: str # the email address
+    value: Optional[str] = None # the email address, keep optional to prevent internal crashes
     display: Optional[str] = None
     type: Optional[str] =  None
     primary: Optional[bool] = False
 
-    user_id: int | None = SQLField(default=None, foreign_key="user.id")
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
     user: "User" = Relationship(back_populates="emails")
 
 class Meta(SQLModel, table = True):
@@ -56,7 +56,7 @@ class Address(SQLModel, table=True):
 
 class PhoneNumber(SQLModel, table=True):
     id: Optional[int] = SQLField(default=None, primary_key=True)
-    value: str 
+    value: Optional[str] = None
     display: Optional[str] = None
     type: Optional[str] = None
 
@@ -68,8 +68,10 @@ class Manager(SQLModel, table=True):
     #Manager - complex type refers to another user
     id: Optional[int] = SQLField(default=None, primary_key=True)
 
-    # id of the user id , how
-    value: Optional[str] = None
+    # value
+    manager_user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
+    manager_user: "User" = Relationship() # the user ID of the manager
+
     ref: Optional[str] = SQLField(default=None) # URI of the manager resource
     display_name: Optional[str] = None 
     # one to one relationship
