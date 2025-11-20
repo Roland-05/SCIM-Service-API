@@ -1,4 +1,4 @@
-from app.schemas.schemas import (NameScim, EmailScim, AddressScim, PhoneNumberScim, RoleScim, EntitlementScim, ManagerScim)
+from app.schemas.sub_schemas import (NameScim, EmailScim, AddressScim, PhoneNumberScim, RoleScim, EntitlementScim, ManagerScim)
 from pydantic import Field
 from app.schemas.api_base import APIBase
 from typing import Optional
