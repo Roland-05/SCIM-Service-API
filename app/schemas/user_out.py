@@ -30,7 +30,7 @@ class UserPublic(APIResponse):
 
     # Nested schema
     name: Optional[NameScim] = None
-    emails: list[EmailScim] 
+    emails: list[EmailScim] = Field(default_factory=list)
     meta: MetaScim
     addresses: list[AddressScim] = Field(default_factory=list)
     phone_numbers: list[PhoneNumberScim] = Field(default_factory=list)

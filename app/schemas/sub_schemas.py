@@ -41,8 +41,8 @@ class AddressScim(APIBase):
     primary: Optional[bool] = None # Defaulting to None/NULL in DB
 
 class ManagerScim(APIBase):
-    value: Optional[str] = None
-    ref: Optional[str] = Field(default=None, alias="$ref")
+    manager_user_id: Optional[str] = Field(default=None, alias="value")
+    manager_ref: Optional[str] = Field(default=None, alias="$ref")
     display_name: Optional[str] = None
 
 
@@ -68,5 +68,5 @@ class EntitlementScim(APIBase):
 
 class GroupRefScim(APIBase):
     value: str
-    ref: Optional[str] = Field(default=None, alias="$ref")
+    group_ref: Optional[str] = Field(default=None, alias="$ref")
     display: Optional[str] = None

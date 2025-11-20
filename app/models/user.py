@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Session, Field as SQLField, Relationship
+from sqlmodel import SQLModel, Field as SQLField, Relationship
 from typing import Optional
 from datetime import datetime
 
