@@ -4,42 +4,42 @@ from datetime import datetime
 
 class Name(SQLModel, table = True):
     id: Optional[int] = SQLField(default=None, primary_key = True)
-    formatted: Optional[str]
+    formatted: Optional[str] = None
     family_name: str # required
     given_name: str # required
-    middle_name: Optional[str] 
-    honorific_prefix: Optional[str]
-    honorific_suffix: Optional[str]
+    middle_name: Optional[str]  = None
+    honorific_prefix: Optional[str] = None
+    honorific_suffix: Optional[str] = None
 
-    user_id: int | None = SQLField(default=None, foreign_key="user.id")
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique=True)
     user: "User" = Relationship(back_populates="name")
 
 
 class Email(SQLModel, table=True):
     id: Optional[int] = SQLField(default=None, primary_key = True)
-    value: str # the email address
-    display: Optional[str]
-    type: Optional[str]
+    value: Optional[str] = None # the email address, keep optional to prevent internal crashes
+    display: Optional[str] = None
+    type: Optional[str] =  None
     primary: Optional[bool] = False
 
-    user_id: int | None = SQLField(default=None, foreign_key="user.id")
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
     user: "User" = Relationship(back_populates="emails")
 
 class Meta(SQLModel, table = True):
-    id: int | None = SQLField(default = None, primary_key=True)
+    id: Optional[int] = SQLField(default = None, primary_key=True)
     resource_type: str = "User"
     created: datetime = SQLField(default_factory=datetime.utcnow, nullable = False)
     last_modified: datetime = SQLField(default_factory=datetime.utcnow, nullable=False)
     version: Optional[str] = None
-    location: Optional[str] # URL of resource
+    location: Optional[str] = None # URL of resource
 
     # Foreign key with unique=True constraint (one Meta object per User)
-    user_id: int | None = SQLField(default=None, foreign_key="user.id", unique=True)
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique=True)
     user: "User" = Relationship(back_populates="meta")
 
 
 class Address(SQLModel, table=True):
-    id: int | None = SQLField(default=None, primary_key=True)
+    id: Optional[int] = SQLField(default=None, primary_key=True)
 
     # Optional Fields from SCIM standard
     formatted: Optional[str] = None
@@ -54,9 +54,9 @@ class Address(SQLModel, table=True):
     user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
     user: "User" = Relationship(back_populates="addresses")
 
-class phoneNumber(SQLModel, table=True):
+class PhoneNumber(SQLModel, table=True):
     id: Optional[int] = SQLField(default=None, primary_key=True)
-    value: str = None
+    value: Optional[str] = None
     display: Optional[str] = None
     type: Optional[str] = None
 
@@ -68,12 +68,14 @@ class Manager(SQLModel, table=True):
     #Manager - complex type refers to another user
     id: Optional[int] = SQLField(default=None, primary_key=True)
 
-    # id of the user id , how
-    value: Optional[str] = None
-    ref: Optional[str] = SQLField(default=None, alias="$ref") # URI of the manager resource
-    display_name: Optional[str] = None 
+    # value
+    manager_user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
+    manager_user: "User" = Relationship() # the user ID of the manager
 
-    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
+    ref: Optional[str] = SQLField(default=None) # URI of the manager resource
+    display_name: Optional[str] = None 
+    # one to one relationship
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique = True)
     user: "User" = Relationship(back_populates="manager")
     
 
@@ -94,15 +96,21 @@ class User(SQLModel, table = True):
     user_type: Optional[str] = None
     preferred_language: Optional[str] = None
 
-   # required: Defines the schema URIs this resource uses
-    schemas: list[str] = SQLField(default_factory=lambda: ["urn:ietf:params:scim:schemas:core:2.0:User"])
+    # required: Defines the schema URIs this resource uses
+    # Includes both the Core and the Enterprise Extension Schemas
+    schemas: list[str] = SQLField(
+        default_factory=lambda: [
+            "urn:ietf:params:scim:schemas:core:2.0:User",
+            "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+        ]
+    )
 
     # Parent side relationships
-    name: Optional[Name] = Relationship(back_populates="user")
-    emails: list[Email] = Relationship(back_populates="user")
-    addresses: list[Address] = Relationship(back_populates="user")
-    meta: Optional[Meta] = Relationship(back_populates="user")
-    phone_numbers: list[phoneNumber] = Relationship(back_populates="user")
+    name: Optional[Name] = Relationship(back_populates="user", cascade="all, delete") # cascade to delete child rows (prevent orphaned data)
+    emails: list[Email] = Relationship(back_populates="user", cascade="all, delete-orphan") # e.g. user.emails.pop(0)
+    addresses: list[Address] = Relationship(back_populates="user", cascade="all, delete-orphan")
+    meta: Optional[Meta] = Relationship(back_populates="user", cascade="all, delete")
+    phone_numbers: list[PhoneNumber] = Relationship(back_populates="user", cascade="all, delete-orphan")
 
     # enterprise
     employee_number: Optional[str] = None
@@ -110,7 +118,7 @@ class User(SQLModel, table = True):
     organization: Optional[str] = None
     division: Optional[str] = None
     department: Optional[str] = None
-    manager: Optional[Manager] = Relationship(back_populates="user")
+    manager: Optional[Manager] = Relationship(back_populates="user", cascade="all, delete")
 
 
 
