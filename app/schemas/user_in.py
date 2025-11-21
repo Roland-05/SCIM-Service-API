@@ -12,6 +12,16 @@ class UserCreate(APIBase):
     display_name: Optional[str] = None
     active: Optional[bool] = True
 
+# Simple Optional SCIM Attributes 
+    locale: Optional[str] = None
+    timezone: Optional[str] = None
+    nick_name: Optional[str] = None
+    profile_url: Optional[str] = None
+    title: Optional[str] = None
+    user_type: Optional[str] = None
+    preferred_language: Optional[str] = None
+
+
     # Nested Schemas
 
     name: Optional[NameScim] = None
@@ -31,3 +41,4 @@ class UserCreate(APIBase):
     division: Optional[str] = None
     department: Optional[str] = None
     manager: Optional[ManagerScim] = None
+
