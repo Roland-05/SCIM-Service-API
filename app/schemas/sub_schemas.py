@@ -61,9 +61,16 @@ class ImScim(APIBase):
 
 class RoleScim(APIBase):
     value: str
+    display:Optional[str] = None
+    type: Optional[str] = None
+
+    # SCIM Optional 
 
 class EntitlementScim(APIBase):
+
     value: str
+    display:Optional[str] = None
+    type: Optional[str] = None
 
 
 class GroupRefScim(APIBase):
