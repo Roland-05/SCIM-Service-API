@@ -11,7 +11,7 @@ class Name(SQLModel, table = True):
     honorific_prefix: Optional[str] = None
     honorific_suffix: Optional[str] = None
 
-    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique=True)
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique=True, nullable=False)
     user: "User" = Relationship(back_populates="name")
 
 
@@ -22,7 +22,7 @@ class Email(SQLModel, table=True):
     type: Optional[str] =  None
     primary: Optional[bool] = False
 
-    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", nullable=False)
     user: "User" = Relationship(back_populates="emails")
 
 class Meta(SQLModel, table = True):
@@ -34,7 +34,7 @@ class Meta(SQLModel, table = True):
     location: Optional[str] = None # URL of resource
 
     # Foreign key with unique=True constraint (one Meta object per User)
-    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique=True)
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique=True, nullable=False)
     user: "User" = Relationship(back_populates="meta")
 
 
@@ -51,7 +51,7 @@ class Address(SQLModel, table=True):
     type: Optional[str] = None # e.g. 'work', 'home'
     primary: Optional[bool] = None 
 
-    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", nullable=False)
     user: "User" = Relationship(back_populates="addresses")
 
 class PhoneNumber(SQLModel, table=True):
@@ -60,8 +60,18 @@ class PhoneNumber(SQLModel, table=True):
     display: Optional[str] = None
     type: Optional[str] = None
 
-    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", nullable=False)
     user: "User" = Relationship(back_populates="phone_numbers")
+
+class Role(SQLModel, table=True):
+    id: Optional[int] = SQLField(default=None, primary_key=True)
+
+    value: Optional[str] = None     # required by SCIM schema
+    display: Optional[str] = None
+    type: Optional[str] = None
+
+    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", nullable=False)
+
 
 # Enterprise User Schema Extension
 class Manager(SQLModel, table=True):
@@ -69,7 +79,7 @@ class Manager(SQLModel, table=True):
     id: Optional[int] = SQLField(default=None, primary_key=True)
 
     # value
-    manager_user_id: Optional[int] = SQLField(default=None, foreign_key="user.id")
+    manager_user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", nullable=False)
     manager_user: "User" = Relationship() # the user ID of the manager
 
     ref: Optional[str] = SQLField(default=None) # URI of the manager resource
@@ -77,6 +87,21 @@ class Manager(SQLModel, table=True):
     # one to one relationship
     user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique = True)
     user: "User" = Relationship(back_populates="manager")
+
+
+
+class EnterpriseExtension(SQLModel, table=True):
+    id: Optional[int] = SQLField(default=None, primary_key=True)
+    user_id: int = SQLField(foreign_key="user.id")
+
+    employee_number: Optional[str] = None
+    cost_center: Optional[str] = None
+    division: Optional[str] = None
+    department: Optional[str] = None
+    organization: Optional[str] = None
+
+    user: "User" = Relationship(back_populates="enterprise_extension")
+
     
 
 
@@ -88,13 +113,13 @@ class User(SQLModel, table = True):
     active: Optional[bool] = True
 
     # Optional fields
-    locale: Optional[str] = None
-    timezone: Optional[str] = None
-    nick_name: Optional[str] = None
-    profile_url: Optional[str] = None
-    title: Optional[str] = None
-    user_type: Optional[str] = None
-    preferred_language: Optional[str] = None
+    # locale: Optional[str] = None
+    # timezone: Optional[str] = None
+    # nick_name: Optional[str] = None
+    # profile_url: Optional[str] = None
+    # title: Optional[str] = None
+    # user_type: Optional[str] = None
+    # preferred_language: Optional[str] = None
 
     # required: Defines the schema URIs this resource uses
     # Includes both the Core and the Enterprise Extension Schemas
@@ -111,14 +136,12 @@ class User(SQLModel, table = True):
     addresses: list[Address] = Relationship(back_populates="user", cascade="all, delete-orphan")
     meta: Optional[Meta] = Relationship(back_populates="user", cascade="all, delete")
     phone_numbers: list[PhoneNumber] = Relationship(back_populates="user", cascade="all, delete-orphan")
-
-    # enterprise
-    employee_number: Optional[str] = None
-    cost_center: Optional[str] = None
-    organization: Optional[str] = None
-    division: Optional[str] = None
-    department: Optional[str] = None
+    roles: list[Role] = Relationship(back_populates="user", cascade_delete="all, delete-orphan")
     manager: Optional[Manager] = Relationship(back_populates="user", cascade="all, delete")
+
+    enterprise_extension: Optional["EnterpriseExtension"] = Relationship(back_populates="user", cascade="all,delete")
+
+
 
 
 
