@@ -77,3 +77,11 @@ class GroupRefScim(APIBase):
     value: str
     group_ref: Optional[str] = Field(default=None, alias="$ref")
     display: Optional[str] = None
+
+
+class EnterpriseExtensionScim(APIBase):
+    employee_number: Optional[str] = None
+    department: Optional[str] = None
+    division: Optional[str] = None
+    organization: Optional[str] = None
+    cost_center: Optional[str] = None

@@ -1,4 +1,4 @@
-from app.schemas.sub_schemas import (NameScim, EmailScim, AddressScim, PhoneNumberScim, RoleScim, EntitlementScim, ManagerScim)
+from app.schemas.sub_schemas import (NameScim, EmailScim, AddressScim, PhoneNumberScim, RoleScim, EntitlementScim, ManagerScim, EnterpriseExtensionScim)
 from pydantic import Field
 from app.schemas.api_base import APIBase
 from typing import Optional
@@ -34,11 +34,15 @@ class UserCreate(APIBase):
     entitlements: list[EntitlementScim] = Field(default_factory=list)
 
     # Enterprise
+    enterprise_extension: Optional[EnterpriseExtensionScim] = Field(
+        default=None,
+        alias="urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+    )
 
-    employee_number: Optional[str] = None
-    cost_center: Optional[str] = None
-    organization: Optional[str] = None
-    division: Optional[str] = None
-    department: Optional[str] = None
-    manager: Optional[ManagerScim] = None
+    # employee_number: Optional[str] = None
+    # cost_center: Optional[str] = None
+    # organization: Optional[str] = None
+    # division: Optional[str] = None
+    # department: Optional[str] = None
+    # manager: Optional[ManagerScim] = None
 
