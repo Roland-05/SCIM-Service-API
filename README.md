@@ -75,7 +75,7 @@ The project uses a **three-layer backend pattern**, ensuring clean separation be
 
 ---
 
-## 🗄️ Database Models (SQLModel)
+## Database Models (SQLModel)
 
 The SCIM User resource maps to multiple SQLModel tables:
 
@@ -92,6 +92,30 @@ Relationships:
 Foreign keys and constraints maintain SCIM consistency and data integrity.
 
 ---
+
+## Testing
+Unit tests (in progress) use:
+pytest
+FastAPI TestClient
+SQLModel in-memory SQLite DB
+This ensures:
+isolated test environments
+deterministic behavior
+no external dependencies
+Example scaffold:
+
+def test_create_user():
+    response = client.post("/Users", json={...})
+    assert response.status_code == 201
+
+
+
+## Future Enhancements
+Group resource support (/Groups)
+Token-based auth for management endpoints
+Pagination & sorting
+SCIM bulk operations
+Dockerfile + compose for local provisioning
 
 ## 🔒 SCIM Compliance Details
 
@@ -111,28 +135,7 @@ The API returns responses wrapped in the correct SCIM structure:
   }
 }
 
-Testing
-Unit tests (in progress) use:
-pytest
-FastAPI TestClient
-SQLModel in-memory SQLite DB
-This ensures:
-isolated test environments
-deterministic behavior
-no external dependencies
-Example scaffold:
-
-def test_create_user():
-    response = client.post("/Users", json={...})
-    assert response.status_code == 201
 
 
-
-📬 Future Enhancements
-Group resource support (/Groups)
-Token-based auth for management endpoints
-Pagination & sorting
-SCIM bulk operations
-Dockerfile + compose for local provisioning
 
 
