@@ -1,29 +1,43 @@
-# SCIM Provisioning API
+# SCIM 2.0 Provisioning API  
+FastAPI • SQLModel • Pydantic • Azure Entra ID Integration
 
-A backend service implementation of the SCIM 2.0 (System for Cross-domain Identity Management) specification.
+This project implements a **SCIM 2.0–compliant User resource API** designed for automated identity provisioning from **Azure Entra ID (Azure AD)** and other SCIM-capable identity providers.  
+It follows RFC 7643 (Schemas) and RFC 7644 (Protocol).
 
-## Status
+The API uses a clean, layered architecture:
+- **API Layer** — request validation & SCIM response formatting  
+- **Service Layer** — business logic & SCIM operations  
+- **Database Layer** — SQLModel ORM, relationships, and persistence  
 
-**In Development**: Currently working on implementing the core API endpoints and finishing CRUD operations for User resources.
+This project is actively being expanded with full CRUD, filtering, and PATCH support.
 
-## Technologies Used
+---
 
-*   **Python:** The primary programming language.
-*   **FastAPI:** For building the API layer.
-*   **SQLModel / SQLAlchemy:** For defining database models and managing persistence.
-*   **Pydantic:** For data validation and API schemas.
-*   **SQLite:** (Or Postgres/MySQL) For the database.
+## 🚀 Features
 
-## Project Goals
+### ✔ Implemented
+- **SCIM 2.0 User Resource (RFC 7643)**
+- Nested identity attributes:
+  - `name` (formatted, givenName, familyName, etc.)
+  - `phoneNumbers`
+  - `manager`
+- SQLModel relational models with:
+  - One-to-one (e.g., User ↔ Name)
+  - One-to-many (e.g., User ↔ PhoneNumbers)
+- **User creation endpoint (`POST /Users`)**
+- **User retrieval (`GET /Users/{id}`)**
+- SCIM-compliant response formatting (schemas[], meta, null-handling)
+- Defensive parsing for Entra ID’s inconsistent payloads  
+  (e.g., unexpected fields during disable operations)
 
-*   [ ] Adhere to SCIM 2.0 standards ([RFC 7643](https://datatracker.ietf.org/doc/html/rfc7643), [RFC 7644](https://datatracker.ietf.org/doc/html/rfc7644)).
-*   [x] Define robust database schemas and relationships.
-*   [ ] Implement all required User endpoints (Create, Read, Update, Delete, Search).
-*   [ ] Add basic authentication/authorization (e.g., Bearer Token).
-*   [ ] Write unit and integration tests.
+### 🔧 In Progress
+- **Full CRUD** (create, read, update, delete/disable)
+- **SCIM Filtering** (`GET /Users?filter=userName eq "..."`)
+- **SCIM PATCH** (replace, add, remove operations)
+- **Automated tests** using pytest + in-memory SQLModel DB
+- Postman collection for provisioning tests
 
-## Installation and Usage
+---
 
-(Brief instructions on how to clone the repo and run the code locally)
-
+## 🏗️ Architecture
 
