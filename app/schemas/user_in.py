@@ -21,6 +21,7 @@ class UserCreate(APIBase):
     user_type: Optional[str] = None
     preferred_language: Optional[str] = None
 
+    
 
     # Nested Schemas
 
@@ -32,6 +33,7 @@ class UserCreate(APIBase):
 
     roles: list[RoleScim] = Field(default_factory=list)
     entitlements: list[EntitlementScim] = Field(default_factory=list)
+    manager: Optional[ManagerScim] = None
 
     # Enterprise
     enterprise_extension: Optional[EnterpriseExtensionScim] = Field(

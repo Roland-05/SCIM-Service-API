@@ -25,17 +25,17 @@ class Email(SQLModel, table=True):
     user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", nullable=False)
     user: "User" = Relationship(back_populates="emails")
 
-class Meta(SQLModel, table = True):
-    id: Optional[int] = SQLField(default = None, primary_key=True)
-    resource_type: str = "User"
-    created: datetime = SQLField(default_factory=datetime.utcnow, nullable = False)
-    last_modified: datetime = SQLField(default_factory=datetime.utcnow, nullable=False)
-    version: Optional[str] = None
-    location: Optional[str] = None # URL of resource
+# class Meta(SQLModel, table = True):
+#     id: Optional[int] = SQLField(default = None, primary_key=True)
+#     resource_type: str = "User"
+#     created: datetime = SQLField(default_factory=datetime.utcnow, nullable = False)
+#     last_modified: datetime = SQLField(default_factory=datetime.utcnow, nullable=False)
+#     version: Optional[str] = None
+#     location: Optional[str] = None # URL of resource
 
-    # Foreign key with unique=True constraint (one Meta object per User)
-    user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique=True, nullable=False)
-    user: "User" = Relationship(back_populates="meta")
+#     # Foreign key with unique=True constraint (one Meta object per User)
+#     user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique=True, nullable=False)
+#     user: "User" = Relationship(back_populates="meta")
 
 
 class Address(SQLModel, table=True):
@@ -78,13 +78,15 @@ class Manager(SQLModel, table=True):
     #Manager - complex type refers to another user
     id: Optional[int] = SQLField(default=None, primary_key=True)
 
-    # value
+    # The user this manager row belongs to 
     manager_user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", nullable=False)
     manager_user: "User" = Relationship() # the user ID of the manager
 
     ref: Optional[str] = SQLField(default=None) # URI of the manager resource
     display_name: Optional[str] = None 
+
     # one to one relationship
+    # the manager user (boss man)
     user_id: Optional[int] = SQLField(default=None, foreign_key="user.id", unique = True)
     user: "User" = Relationship(back_populates="manager")
 
@@ -134,7 +136,7 @@ class User(SQLModel, table = True):
     name: Optional[Name] = Relationship(back_populates="user", cascade="all, delete") # cascade to delete child rows (prevent orphaned data)
     emails: list[Email] = Relationship(back_populates="user", cascade="all, delete-orphan") # e.g. user.emails.pop(0)
     addresses: list[Address] = Relationship(back_populates="user", cascade="all, delete-orphan")
-    meta: Optional[Meta] = Relationship(back_populates="user", cascade="all, delete")
+    # meta: Optional[Meta] = Relationship(back_populates="user", cascade="all, delete")
     phone_numbers: list[PhoneNumber] = Relationship(back_populates="user", cascade="all, delete-orphan")
     roles: list[Role] = Relationship(back_populates="user", cascade_delete="all, delete-orphan")
     manager: Optional[Manager] = Relationship(back_populates="user", cascade="all, delete")

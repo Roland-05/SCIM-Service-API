@@ -1,7 +1,8 @@
 from sqlmodel import Session, select # select builds sql query
 from app.models.user import User
 from app.schemas.user_in import UserCreate # input schema
-from app.models.user import Name, Email, Meta, Manager, Address, Role, PhoneNumber, EnterpriseExtension
+from app.models.user import Name, Email, Meta, Manager, Address, Role, PhoneNumber, EnterpriseExtension, Manager
+from app.schemas.user_update import UserUpdate
 from fastapi import HTTPException
 
 
@@ -73,12 +74,15 @@ class UserService:
 
         if phone_number_data:
             db_user.phone_numbers = [PhoneNumber.model_validate(p) for p in phone_number_data]
+        
+        if db_user.manager and db_user.manager.manager_user_id:
+            db_user.manager = Manager.model_validate(manager_data)
 
         if enterprise_data: 
             db_user.enterprise_extension = EnterpriseExtension.model_validate(enterprise_data)
 
 
-        db_user.meta = Meta()
+ 
 
         # commit
         self.session.add(db_user)  
@@ -98,3 +102,21 @@ class UserService:
     
     def list_users(self):
         return self.session.exec(select(User)).all()
+    
+
+
+    def update_user(self, user_id: int, data: UserUpdate):
+        db_user = self.get_user(user_id)
+
+        update_data = data.model_dump(exclude_unset=True)
+
+        for field,value in update_data.items():
+            setattr(db_user, field, value)
+
+        self.session.add(db_user)
+        self.session.commit()
+        self.session.refresh(db_user)
+
+
+
+        return db_user
