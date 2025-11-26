@@ -3,8 +3,9 @@ from app.models.user import User
 from app.schemas.user_in import UserCreate # input schema
 from app.models.user import Name, Email, Meta, Manager, Address, Role, PhoneNumber, EnterpriseExtension, Manager
 from app.schemas.user_update import UserUpdate
+from app.schemas.user_patch import UserPatch, PatchRequest
 from fastapi import HTTPException
-
+from typing import Any
 
 
 
@@ -108,10 +109,11 @@ class UserService:
     def update_user(self, user_id: int, data: UserUpdate):
         db_user = self.get_user(user_id)
 
+        
         update_data = data.model_dump(exclude_unset=True)
 
         for field,value in update_data.items():
-            setattr(db_user, field, value)
+            setattr(db_user, field, value) # update the values
 
         self.session.add(db_user)
         self.session.commit()
@@ -120,3 +122,35 @@ class UserService:
 
 
         return db_user
+    
+    def patch_user(self, user_id: int, patch: PatchRequest):
+
+        db_user = self.get_user(user_id)
+
+        for op in patch.Operations:
+            if op.op.lower() == "replace":
+                self._apply_replace(db_user, op.path, op.value)
+            
+            else:
+                raise NotImplementedError(f"Unsupported op: {op.op}")
+            
+        
+        self.session.add(db_user)
+        self.session.commit()
+        self.session.refresh(db_user)
+
+        return db_user
+
+    def _apply_replace(self, db_user, path:str, value: Any):
+
+        attributes = path.split('.')
+
+        target = db_user
+
+        # walk down nested objects
+        for attr in attributes[:-1]:
+            target = getattr(target, attr)
+
+        leaf = attributes[-1]
+        setattr(target, leaf, value)
+        
