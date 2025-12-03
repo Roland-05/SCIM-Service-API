@@ -9,6 +9,7 @@ from app.services.user_service import UserService
 from app.schemas.user_in import UserCreate
 from app.schemas.user_out import UserPublic
 from app.schemas.user_update import UserUpdate
+from app.schemas.user_patch import PatchRequest, PatchOperation
 
 router = APIRouter()
  
@@ -22,21 +23,29 @@ def create_user(user_in: UserCreate, session:Session = Depends(get_session)):
 def get_user(user_id: int, session: Session = Depends(get_session)):
     service = UserService(session)
     user = service.get_user(user_id)
-    return UserPublic.model_validate(user)
+    return to_scim_user(user)
 
 @router.get("/Users", response_model=list[UserPublic])
 def list_users(session: Session = Depends(get_session)):
     service = UserService(session)
     users = service.list_users()
-    return [UserPublic.model_validate(u) for u in users]
+    return [to_scim_user(u) for u in users]
 
-@router.get("/Users/{user_id}", response_model=UserPublic)
+@router.put("/Users/{user_id}", response_model=UserPublic)
 def update_user(user_id: int, user_update: UserUpdate, session:Session = Depends(get_session)):
 
     service = UserService(session)
     updated = service.update_user(user_id, user_update)
 
     return to_scim_user(updated)
+
+
+@router.patch("/Users/{user_id}", response_model=UserPublic)
+def patch_user(user_id: int, patch: PatchRequest, session: Session = Depends(get_session)):
+    service = UserService(session)
+    db_user = service.patch_user(user_id, patch)
+    return to_scim_user(db_user)
+
 
 def to_scim_user(db_user):
 
@@ -62,6 +71,8 @@ def to_scim_user(db_user):
         location=f"/Users/{db_user.id}",
         version=None
     )
+
+
 
     # manager mapping
     if db_user.manager:
